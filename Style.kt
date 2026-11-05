@@ -6,14 +6,18 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.widget.Button
 
+// Dark neon theme: black/deep-purple background, cyan + purple neon accents.
+// GOLD_TOP / GOLD_BOTTOM are the two accent colors (cyan -> purple); the names are kept
+// so the other files do not need to change.
 object Style {
-    val BG_TOP = 0xFF0B5CFF.toInt()
-    val BG_BOTTOM = 0xFF062678.toInt()
-    val GOLD_TOP = 0xFFFFF176.toInt()
-    val GOLD_BOTTOM = 0xFFFFB300.toInt()
-    val CARD = 0x33FFFFFF.toInt()
+    val BG_TOP = 0xFF05060F.toInt()
+    val BG_BOTTOM = 0xFF1B0B3B.toInt()
+    val GOLD_TOP = 0xFF00E5FF.toInt()
+    val GOLD_BOTTOM = 0xFFB44CFF.toInt()
+    val CARD = 0x1AFFFFFF.toInt()
+    val CARD_BORDER = 0x6600E5FF.toInt()
     val TEXT_DIM = 0xB3FFFFFF.toInt()
-    val NAVY = 0xFF0A2A7A.toInt()
+    val NAVY = 0xFF05060F.toInt()
 
     fun dp(c: Context, v: Int): Int = (v * c.resources.displayMetrics.density).toInt()
 
@@ -23,12 +27,13 @@ object Style {
     fun card(radius: Float): GradientDrawable {
         val g = GradientDrawable()
         g.setColor(CARD)
+        g.setStroke(2, CARD_BORDER)
         g.cornerRadius = radius
         return g
     }
 
     fun goldFill(radius: Float): GradientDrawable {
-        val g = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, intArrayOf(GOLD_TOP, GOLD_BOTTOM))
+        val g = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(GOLD_TOP, GOLD_BOTTOM))
         g.cornerRadius = radius
         return g
     }
