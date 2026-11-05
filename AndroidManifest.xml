@@ -18,7 +18,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="PUBG Flash Launch"
+        android:label="Flash Alarm"
         android:theme="@android:style/Theme.Material.NoActionBar">
 
         <activity

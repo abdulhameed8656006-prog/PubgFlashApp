@@ -2,8 +2,8 @@ package com.abdulhameed.pubgflash
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -12,7 +12,9 @@ import android.speech.tts.TextToSpeech
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Button
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import java.util.Locale
@@ -35,49 +37,63 @@ class AlarmActivity : Activity(), TextToSpeech.OnInitListener {
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         )
-        val density = resources.displayMetrics.density
+        window.statusBarColor = Style.BG_TOP
+        window.navigationBarColor = Style.BG_BOTTOM
+
         val root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
         root.gravity = Gravity.CENTER
-        root.setBackgroundColor(0xFF1A0808.toInt())
-        root.setPadding((24 * density).toInt(), 0, (24 * density).toInt(), 0)
+        root.background = Style.background()
+        root.setPadding(Style.dp(this, 24), 0, Style.dp(this, 24), 0)
+
+        val logo = ImageView(this)
+        logo.setImageResource(R.drawable.ic_launcher)
+        root.addView(logo, LinearLayout.LayoutParams(Style.dp(this, 130), Style.dp(this, 130)))
+        val pulse = ScaleAnimation(
+            1f, 1.12f, 1f, 1.12f,
+            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f
+        )
+        pulse.duration = 600
+        pulse.repeatMode = Animation.REVERSE
+        pulse.repeatCount = Animation.INFINITE
+        logo.startAnimation(pulse)
 
         val t = TextView(this)
         t.text = "PUBG Flash is out!"
         t.textSize = 32f
         t.typeface = Typeface.DEFAULT_BOLD
-        t.setTextColor(0xFFFF6B6B.toInt())
+        t.setTextColor(Style.GOLD_TOP)
         t.gravity = Gravity.CENTER
+        t.setPadding(0, Style.dp(this, 24), 0, 0)
         root.addView(t)
 
-        val lp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (60 * density).toInt())
-        lp.setMargins(0, (28 * density).toInt(), 0, 0)
+        val sub = TextView(this)
+        sub.text = "Flash Alarm"
+        sub.textSize = 15f
+        sub.setTextColor(Style.TEXT_DIM)
+        sub.gravity = Gravity.CENTER
+        root.addView(sub)
 
-        root.addView(makeButton("Stop alarm", 0xFFFF4D4D.toInt(), 0xFFFFFFFF.toInt(), density) {
-            Store.ack(this)
-            finish()
-        }, lp)
-        root.addView(makeButton("Open Google Play", 0xFFFFB400.toInt(), 0xFF111111.toInt(), density) {
-            Store.ack(this)
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Store.PLAY_URL)))
-            finish()
-        }, lp)
+        val lp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        lp.setMargins(0, Style.dp(this, 28), 0, 0)
+        root.addView(
+            Style.button(this, "Stop alarm", true) {
+                Store.ack(this)
+                finish()
+            }, lp
+        )
+        val lp2 = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        lp2.setMargins(0, Style.dp(this, 12), 0, 0)
+        root.addView(
+            Style.button(this, "Open Google Play", false) {
+                Store.ack(this)
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Store.PLAY_URL)))
+                finish()
+            }, lp2
+        )
+
         setContentView(root)
         tts = TextToSpeech(this, this)
-    }
-
-    private fun makeButton(text: String, bg: Int, fg: Int, density: Float, onClick: () -> Unit): Button {
-        val b = Button(this)
-        b.text = text
-        b.isAllCaps = false
-        b.textSize = 18f
-        b.setTextColor(fg)
-        val g = GradientDrawable()
-        g.setColor(bg)
-        g.cornerRadius = 14 * density
-        b.background = g
-        b.setOnClickListener { onClick() }
-        return b
     }
 
     override fun onInit(status: Int) {

@@ -1,12 +1,67 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <!-- Blue rounded background -->
+    <path android:pathData="M112,0 H400 A112,112 0 0 1 512,112 V400 A112,112 0 0 1 400,512 H112 A112,112 0 0 1 0,400 V112 A112,112 0 0 1 112,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="307.2"
+                android:endY="512">
+                <item android:offset="0" android:color="#FF4FC3FF" />
+                <item android:offset="1" android:color="#FF0B5CFF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Soft highlights -->
     <path
-        android:fillColor="#0B0B0F"
-        android:pathData="M0,0h108v108h-108z" />
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.18"
+        android:pathData="M10,400 A120,40 0 1 0 250,400 A120,40 0 1 0 10,400 Z" />
     <path
-        android:fillColor="#FFB400"
-        android:pathData="M60,13 L28,59 L50,59 L43,95 L80,45 L57,45 L67,13 Z" />
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.15"
+        android:pathData="M310,120 A90,30 0 1 0 490,120 A90,30 0 1 0 310,120 Z" />
+
+    <!-- Clock face: white ring and blue center -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M106,268 A150,150 0 1 0 406,268 A150,150 0 1 0 106,268 Z" />
+    <path
+        android:fillColor="#FF0A3FB8"
+        android:pathData="M128,268 A128,128 0 1 0 384,268 A128,128 0 1 0 128,268 Z" />
+
+    <!-- Alarm bells -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M130,120 A60,60 0 0 1 200,92 L170,150 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M382,120 A60,60 0 0 0 312,92 L342,150 Z" />
+
+    <!-- Lightning bolt -->
+    <path
+        android:pathData="M290,168 L206,282 H252 L228,372 L318,250 H268 Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="8"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="262"
+                android:startY="168"
+                android:endX="262"
+                android:endY="372">
+                <item android:offset="0" android:color="#FFFFF176" />
+                <item android:offset="1" android:color="#FFFFB300" />
+            </gradient>
+        </aapt:attr>
+    </path>
 </vector>

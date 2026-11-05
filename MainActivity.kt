@@ -4,8 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,7 +13,9 @@ import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.Button
+import android.view.animation.OvershootInterpolator
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -23,6 +25,7 @@ import java.util.Locale
 
 class MainActivity : Activity() {
     private val h = Handler(Looper.getMainLooper())
+    private lateinit var frame: FrameLayout
     private lateinit var tvWhen: TextView
     private lateinit var tvD: TextView
     private lateinit var tvH: TextView
@@ -40,7 +43,12 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.statusBarColor = Style.BG_TOP
+        window.navigationBarColor = Style.BG_BOTTOM
         buildUi()
+        if (savedInstanceState == null && !intent.getBooleanExtra("ack", false)) {
+            showSplash()
+        }
         Notifier.channels(this)
         if (Build.VERSION.SDK_INT >= 33 &&
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
@@ -83,30 +91,23 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
-
-    private fun rounded(color: Int): GradientDrawable {
-        val g = GradientDrawable()
-        g.setColor(color)
-        g.cornerRadius = dp(14).toFloat()
-        return g
-    }
+    private fun dp(v: Int): Int = Style.dp(this, v)
 
     private fun box(parent: LinearLayout, label: String): TextView {
         val col = LinearLayout(this)
         col.orientation = LinearLayout.VERTICAL
         col.gravity = Gravity.CENTER
         col.setPadding(0, dp(16), 0, dp(16))
-        col.background = rounded(0xFF17171F.toInt())
+        col.background = Style.card(dp(16).toFloat())
         val num = TextView(this)
         num.textSize = 30f
         num.typeface = Typeface.DEFAULT_BOLD
-        num.setTextColor(0xFFFFB400.toInt())
+        num.setTextColor(Style.GOLD_TOP)
         num.gravity = Gravity.CENTER
         num.text = "--"
         val lbl = TextView(this)
         lbl.textSize = 11f
-        lbl.setTextColor(0xFF9A9AA6.toInt())
+        lbl.setTextColor(Style.TEXT_DIM)
         lbl.gravity = Gravity.CENTER
         lbl.text = label.uppercase()
         col.addView(num)
@@ -117,38 +118,44 @@ class MainActivity : Activity() {
         return num
     }
 
-    private fun button(text: String, bg: Int, fg: Int, onClick: () -> Unit): Button {
-        val b = Button(this)
-        b.text = text
-        b.isAllCaps = false
-        b.textSize = 16f
-        b.setTextColor(fg)
-        b.background = rounded(bg)
-        b.setOnClickListener { onClick() }
-        return b
-    }
-
     private fun buildUi() {
+        frame = FrameLayout(this)
+        frame.background = Style.background()
+
         val scroll = ScrollView(this)
-        scroll.setBackgroundColor(0xFF0B0B0F.toInt())
+        scroll.isFillViewport = true
         val root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
-        root.setPadding(dp(18), dp(48), dp(18), dp(28))
+        root.setPadding(dp(18), dp(28), dp(18), dp(28))
         scroll.addView(root)
 
+        val logo = ImageView(this)
+        logo.setImageResource(R.drawable.ic_launcher)
+        val logoLp = LinearLayout.LayoutParams(dp(92), dp(92))
+        logoLp.gravity = Gravity.CENTER_HORIZONTAL
+        root.addView(logo, logoLp)
+
         val title = TextView(this)
-        title.text = "\u26A1 PUBG Flash Launch"
-        title.textSize = 24f
+        title.text = "Flash Alarm"
+        title.textSize = 28f
         title.typeface = Typeface.DEFAULT_BOLD
-        title.setTextColor(0xFFF5F5F7.toInt())
+        title.setTextColor(Color.WHITE)
         title.gravity = Gravity.CENTER
+        title.setPadding(0, dp(10), 0, 0)
         root.addView(title)
+
+        val sub = TextView(this)
+        sub.text = "PUBG Flash launch countdown"
+        sub.textSize = 14f
+        sub.setTextColor(Style.TEXT_DIM)
+        sub.gravity = Gravity.CENTER
+        root.addView(sub)
 
         tvWhen = TextView(this)
         tvWhen.textSize = 14f
-        tvWhen.setTextColor(0xFF9A9AA6.toInt())
+        tvWhen.setTextColor(Color.WHITE)
         tvWhen.gravity = Gravity.CENTER
-        tvWhen.setPadding(0, dp(4), 0, dp(22))
+        tvWhen.setPadding(0, dp(18), 0, dp(14))
         root.addView(tvWhen)
 
         val row = LinearLayout(this)
@@ -161,16 +168,16 @@ class MainActivity : Activity() {
 
         tvStatus = TextView(this)
         tvStatus.textSize = 15f
-        tvStatus.setTextColor(0xFFF5F5F7.toInt())
+        tvStatus.setTextColor(Color.WHITE)
         tvStatus.gravity = Gravity.CENTER
-        tvStatus.setPadding(0, dp(18), 0, dp(8))
+        tvStatus.setPadding(0, dp(16), 0, dp(6))
         root.addView(tvStatus)
 
         tvInfo = TextView(this)
         tvInfo.textSize = 14f
-        tvInfo.setTextColor(0xFF9A9AA6.toInt())
-        tvInfo.setPadding(dp(14), dp(14), dp(14), dp(14))
-        tvInfo.background = rounded(0xFF17171F.toInt())
+        tvInfo.setTextColor(Style.TEXT_DIM)
+        tvInfo.setPadding(dp(16), dp(14), dp(16), dp(14))
+        tvInfo.background = Style.card(dp(16).toFloat())
         val infoLp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         infoLp.setMargins(0, dp(10), 0, dp(14))
         root.addView(tvInfo, infoLp)
@@ -178,16 +185,71 @@ class MainActivity : Activity() {
         val btnLp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         btnLp.setMargins(0, dp(8), 0, 0)
         root.addView(
-            button("Open on Google Play", 0xFFFFB400.toInt(), 0xFF111111.toInt()) {
+            Style.button(this, "Open on Google Play", true) {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Store.PLAY_URL)))
             }, btnLp
         )
         root.addView(
-            button("Test the alarm now", 0xFF17171F.toInt(), 0xFFF5F5F7.toInt()) {
+            Style.button(this, "Test the alarm now", false) {
                 Notifier.alarm(this)
             }, btnLp
         )
-        setContentView(scroll)
+
+        frame.addView(
+            scroll,
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        )
+        setContentView(frame)
+    }
+
+    private fun showSplash() {
+        val splash = LinearLayout(this)
+        splash.orientation = LinearLayout.VERTICAL
+        splash.gravity = Gravity.CENTER
+        splash.background = Style.background()
+        splash.isClickable = true
+
+        val logo = ImageView(this)
+        logo.setImageResource(R.drawable.ic_launcher)
+        logo.alpha = 0f
+        logo.scaleX = 0.5f
+        logo.scaleY = 0.5f
+        splash.addView(logo, LinearLayout.LayoutParams(dp(160), dp(160)))
+
+        val name = TextView(this)
+        name.text = "Flash Alarm"
+        name.textSize = 34f
+        name.typeface = Typeface.DEFAULT_BOLD
+        name.setTextColor(Color.WHITE)
+        name.gravity = Gravity.CENTER
+        name.setPadding(0, dp(22), 0, 0)
+        name.alpha = 0f
+        splash.addView(name)
+
+        val tag = TextView(this)
+        tag.text = "Never miss the PUBG Flash launch"
+        tag.textSize = 15f
+        tag.setTextColor(Style.GOLD_TOP)
+        tag.gravity = Gravity.CENTER
+        tag.setPadding(0, dp(6), 0, 0)
+        tag.alpha = 0f
+        splash.addView(tag)
+
+        frame.addView(
+            splash,
+            FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        )
+
+        logo.animate().alpha(1f).scaleX(1f).scaleY(1f)
+            .setDuration(700).setInterpolator(OvershootInterpolator()).start()
+        name.animate().alpha(1f).setStartDelay(500).setDuration(500).start()
+        tag.animate().alpha(1f).setStartDelay(800).setDuration(500).start()
+
+        h.postDelayed({
+            splash.animate().alpha(0f).setDuration(450).withEndAction {
+                frame.removeView(splash)
+            }.start()
+        }, 2200)
     }
 
     private fun showInfo(ok: Boolean) {
